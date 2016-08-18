@@ -1,0 +1,105 @@
+//build.gradle
+
+switch (iibEnv) {
+
+         case "PROD":
+          ant.properties['iib.node.specfile'] = 'iib-node-prod.xml'
+          ant.properties['iib.override.file'] = 'override-prod.properties'
+          break;
+         case "QA":
+          ant.properties['iib.node.specfile'] = 'iib-node-qa.xml'
+          ant.properties['iib.override.file'] = 'override-qa.properties'
+          break;
+         default:
+         ant.properties['iib.node.specfile'] = 'iib-node.xml'
+         ant.properties['iib.override.file'] = 'override.properties'
+}
+
+//Set Ant properties
+
+if (org.gradle.internal.os.OperatingSystem.current().windows) {
+
+        ant.properties['mqsi.deploy'] = 'mqsideploy.exe'
+        ant.properties['mqsi.createbar'] = 'mqsicreatebar.exe'
+        ant.properties['iib.path'] = ext.mqsiprofilePathWin
+        ant.properties['soapui.exec'] = ext.soapUIPathWin + '\testrunner.bat'
+
+
+      } else if (org.gradle.internal.os.OperatingSystem.current().macOsX) {
+
+        ant.properties['mqsi.deploy'] = 'mqsideploy'
+        ant.properties['mqsi.createbar'] = 'mqsicreatebar'
+        ant.properties['iib.path'] = ext.mqsiprofilePathMacOS
+        ant.properties['soapui.exec'] = ext.soapUIPathMacOS + '/testrunner.sh'
+
+      } else {
+
+        ant.properties['mqsi.deploy'] = 'mqsideploy'
+        ant.properties['mqsi.createbar'] = 'mqsicreatebar'
+        ant.properties['iib.path'] = ext.mqsiprofilePathMacUnix
+        ant.properties['soapui.exec'] = ext.soapUIPathMacUnix + '/testrunner.sh'
+}
+
+ant.properties['iib.barfile.dir'] = ext.barfileDir
+ant.properties['iib.svr'] = ext.intServer
+ant.properties['iib.bar.version'] = ext.barFileVersion
+ant.properties['iib.app'] = ext.appName
+ant.properties['iib.mqsicreatebar.params'] = ext.paramsMQSICreateBarfile
+
+if (ext.soapUIParams != 'None') {
+
+  ant.properties['soapui.parameters'] = ext.soapUIParams + ' ' + ext.soapUIProject
+
+} else {
+
+  ant.properties['soapui.parameters'] = ext.soapUIProject
+
+}
+
+ant.importBuild 'build.xml'
+
+
+task multiDeploy() {
+
+  File inFile = file('broker.properties')
+  Properties brokers = readPropsFile(inFile)
+
+  doLast {
+
+  String[] brokerElems
+  def iNode, hostName, Port, iServer
+
+  brokers.each{ key, value ->
+
+    brokerElems = value.split(':')
+
+  //Not very elegant, but here goes ...
+    iNode = brokerElems[0]
+    hostName = brokerElems[1]
+    Port = brokerElems[2]
+    iServer = brokerElems[3]
+
+    ant.mdeploy(inode: iNode,
+                hostname: hostName,
+                port: Port,
+                execgroup: iServer)
+    }
+  }
+}
+
+//------
+
+Properties readPropsFile(File fProps) {
+
+ logger.quiet 'Reading a properties file.'
+
+ if (!fProps.exists()) {
+     throw new GradleException(
+     "Required broker file does not exist: $fProps.canonicalPath")
+ }
+  Properties props = new Properties()
+  fProps.withInputStream { stream -> props.load(stream) }
+  return props
+}
+
+multiDeploy.dependsOn('compile', 'override')
