@@ -31,7 +31,6 @@ switch (iibEnv) {
   // Define parameters for use by runSoapUI task
 
   String soapuiExec, soapuiParameters
-  String[] mqsiProfileCmdLine
 
   // Set Ant properties based on underlying platform
 
@@ -42,8 +41,6 @@ if (org.gradle.internal.os.OperatingSystem.current().windows) {
         ant.properties['mqsi.list'] = 'mqsilist.exe'
         ant.properties['iib.path'] = mqsiprofilePathWin
 
-        mqsiProfileCmdLine = [mqsiprofilePathWin + '\\server\\bin\\mqsiprofile.cmd']
-
         soapuiExec = soapUIPathWin + '\\testrunner.bat'
 
       } else if (org.gradle.internal.os.OperatingSystem.current().macOsX) {
@@ -52,8 +49,6 @@ if (org.gradle.internal.os.OperatingSystem.current().windows) {
         ant.properties['mqsi.createbar'] = 'mqsicreatebar'
         ant.properties['mqsi.list'] = 'mqsilist'
         ant.properties['iib.path'] = mqsiprofilePathMacOS
-
-        mqsiProfileCmdLine = ['/bin/sh', '.', mqsiprofilePathMacOS + '/server/bin/mqsiprofile']
 
         soapuiExec = soapUIPathMacOS + '/testrunner.sh'
 
@@ -75,12 +70,6 @@ if (org.gradle.internal.os.OperatingSystem.current().windows) {
   ant.properties['iib.mqsicreatebar.params'] = paramsMQSICreateBarfile
 
   ant.importBuild 'build.xml'
-
-  task prepareMQSIEnvironment(type:Exec) {
-
-    logger.quiet 'Preparing MQSI environment.'
-    commandLine(mqsiProfileCmdLine)
-  }
 
   task runSoapUI {
 
