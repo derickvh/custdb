@@ -39,6 +39,7 @@
 			<fileset dir="${barfile.dir}" includes="**/${iib.bar}*.bar" />
 			<fileset dir="${basedir}" includes="**/*.log" />
 			<fileset dir="${basedir}" includes="**/TEST*.xml" />
+			<fileset dir="${basedir}" includes="**/*.class" />
 		</delete>
 	</target>
 
@@ -79,6 +80,21 @@
 			<echo message="Command line: @{soapuiexec} @{params}${line.separator}" />
 			<exec executable="@{soapuiexec}" failonerror="true">
 				<arg line="@{params}" />
+			</exec>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="mlist">
+
+		<attribute name="inode" />
+		<attribute name="hostname" default="localhost"/>
+		<attribute name="port" default="4414" />
+
+		<sequential>
+			<echo message="M.LIST target starting ...${line.separator}" />
+			<echo message="Command line: ${iib.path}${file.separator}server${file.separator}bin${file.separator}${mqsi.list} @{inode} -i @{hostname} -p @{port} -d 0 ${line.separator}" />
+			<exec executable="${iib.path}${file.separator}server${file.separator}bin${file.separator}${mqsi.list}" failonerror="true" outputProperty="mqsilist.result">
+				<arg line="@{inode} -i @{hostname} -p @{port} -d 0" />
 			</exec>
 		</sequential>
 	</macrodef>

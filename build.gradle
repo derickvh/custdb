@@ -30,7 +30,7 @@ switch (iibEnv) {
 
   // Define parameters for use by runSoapUI task
 
-  String soapuiExec, soapuiParameters
+  String soapuiExec, soapuiParameters, mqsiProfile
 
   // Set Ant properties based on underlying platform
 
@@ -38,7 +38,10 @@ if (org.gradle.internal.os.OperatingSystem.current().windows) {
 
         ant.properties['mqsi.deploy'] = 'mqsideploy.exe'
         ant.properties['mqsi.createbar'] = 'mqsicreatebar.exe'
+        ant.properties['mqsi.list'] = 'mqsilist.exe'
         ant.properties['iib.path'] = mqsiprofilePathWin
+
+        mqsiProfile = mqsiprofilePathWin + '\\server\\bin\\mqsiprofile.cmd'
 
         soapuiExec = soapUIPathWin + '\\testrunner.bat'
 
@@ -46,7 +49,10 @@ if (org.gradle.internal.os.OperatingSystem.current().windows) {
 
         ant.properties['mqsi.deploy'] = 'mqsideploy'
         ant.properties['mqsi.createbar'] = 'mqsicreatebar'
+        ant.properties['mqsi.list'] = 'mqsilist'
         ant.properties['iib.path'] = mqsiprofilePathMacOS
+
+        mqsiProfile = './setmqsiprofile '  + mqsiprofilePathMacOS + '/server/bin/mqsiprofile'
 
         soapuiExec = soapUIPathMacOS + '/testrunner.sh'
 
@@ -54,7 +60,10 @@ if (org.gradle.internal.os.OperatingSystem.current().windows) {
 
         ant.properties['mqsi.deploy'] = 'mqsideploy'
         ant.properties['mqsi.createbar'] = 'mqsicreatebar'
-        ant.properties['iib.path'] = mqsiprofilePathMacUnix
+        ant.properties['mqsi.list'] = 'mqsilist'
+        ant.properties['iib.path'] = mqsiprofilePathUnix
+
+        mqsiProfile = './setmqsiprofile ' + mqsiprofilePathUnix + '/server/bin/mqsiprofile'
 
         soapuiExec = soapUIPathUnix + '/testrunner.sh'
 }
@@ -65,6 +74,14 @@ if (org.gradle.internal.os.OperatingSystem.current().windows) {
   ant.properties['iib.mqsicreatebar.params'] = paramsMQSICreateBarfile
 
   ant.importBuild 'build.xml'
+
+  task prepareMQSIEnvironment (type: Exec) {
+
+    ant.echo('Preparing the MQSI environment.')
+
+    commandLine(mqsiProfile)
+
+  }
 
     task runSoapUI {
 
@@ -159,5 +176,5 @@ tasks.runSoapUI {
   description "Runs a SoapUI Test Project and save the test results as a junit report in the html folder."
 }
 
-multiDeploy.dependsOn('compile', 'override')
+multiDeploy.dependsOn('prepareMQSIEnvironment','compile', 'override')
 runSoapUI.dependsOn('multiDeploy')
