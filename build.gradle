@@ -30,7 +30,8 @@ switch (iibEnv) {
 
   // Define parameters for use by runSoapUI task
 
-  String soapuiExec, soapuiParameters, mqsiProfile
+  String soapuiExec, soapuiParameters
+  String[] mqsiProfileCmdLine
 
   // Set Ant properties based on underlying platform
 
@@ -41,7 +42,7 @@ if (org.gradle.internal.os.OperatingSystem.current().windows) {
         ant.properties['mqsi.list'] = 'mqsilist.exe'
         ant.properties['iib.path'] = mqsiprofilePathWin
 
-        mqsiProfile = mqsiprofilePathWin + '\\server\\bin\\mqsiprofile.cmd'
+        mqsiProfileCmdLine = [mqsiprofilePathWin + '\\server\\bin\\mqsiprofile.cmd']
 
         soapuiExec = soapUIPathWin + '\\testrunner.bat'
 
@@ -52,7 +53,7 @@ if (org.gradle.internal.os.OperatingSystem.current().windows) {
         ant.properties['mqsi.list'] = 'mqsilist'
         ant.properties['iib.path'] = mqsiprofilePathMacOS
 
-        mqsiProfile = './setmqsiprofile '  + mqsiprofilePathMacOS + '/server/bin/mqsiprofile'
+        mqsiProfileCmdLine = ['/bin/sh', '.', mqsiprofilePathMacOS + '/server/bin/mqsiprofile']
 
         soapuiExec = soapUIPathMacOS + '/testrunner.sh'
 
@@ -63,7 +64,7 @@ if (org.gradle.internal.os.OperatingSystem.current().windows) {
         ant.properties['mqsi.list'] = 'mqsilist'
         ant.properties['iib.path'] = mqsiprofilePathUnix
 
-        mqsiProfile = './setmqsiprofile ' + mqsiprofilePathUnix + '/server/bin/mqsiprofile'
+        mqsiProfileCmdLine = ['/bin/sh', '.', mqsiprofilePathUnix + '/server/bin/mqsiprofile']
 
         soapuiExec = soapUIPathUnix + '/testrunner.sh'
 }
@@ -75,30 +76,28 @@ if (org.gradle.internal.os.OperatingSystem.current().windows) {
 
   ant.importBuild 'build.xml'
 
-  task prepareMQSIEnvironment (type: Exec) {
+  task prepareMQSIEnvironment(type:Exec) {
 
-    ant.echo('Preparing the MQSI environment.')
-
-    commandLine(mqsiProfile)
-
+    logger.quiet 'Preparing MQSI environment.'
+    commandLine(mqsiProfileCmdLine)
   }
 
-    task runSoapUI {
+  task runSoapUI {
 
-      doLast {
+    doLast {
 
-        if (soapUIProject != 'None') {
+      if (soapUIProject != 'None') {
 
-          soapuiParameters = soapUIParams + ' ' + soapUIProject
+        soapuiParameters = soapUIParams + ' ' + soapUIProject
 
-          ant.mruntest(soapuiexec: soapuiExec, params: soapuiParameters)
-          //soapuiXmlToHtml(projectDir)
+        ant.mruntest(soapuiexec: soapuiExec, params: soapuiParameters)
+        //soapuiXmlToHtml(projectDir)
 
-        } else {
-          ant.echo('Nothing to do.')
-        }
+      } else {
+        ant.echo('Nothing to do.')
       }
     }
+  }
 
     task multiDeploy() {
 
@@ -110,7 +109,7 @@ if (org.gradle.internal.os.OperatingSystem.current().windows) {
         String[] brokerElems
         def iNode, hostName, Port, iServer
 
-        brokers.each{ key, value ->
+        brokers.each { key, value ->
 
           brokerElems = value.split(':')
 
@@ -176,5 +175,5 @@ tasks.runSoapUI {
   description "Runs a SoapUI Test Project and save the test results as a junit report in the html folder."
 }
 
-multiDeploy.dependsOn('prepareMQSIEnvironment','compile', 'override')
+multiDeploy.dependsOn('compile', 'override')
 runSoapUI.dependsOn('multiDeploy')
