@@ -21,6 +21,9 @@
 
 	<uptodate property="deploy.only" targetfile="${iib.barfile.param}">
 		<srcfiles dir="${basedir}" includes="**/*.msgflow" />
+		<srcfiles dir="${basedir}" includes="**/*.subflow" />
+		<srcfiles dir="${basedir}" includes="**/*.java" />
+		<srcfiles dir="${basedir}" includes="**/*.esql" />
 	</uptodate>
 
 	<!-- Create build start time stamp -->
@@ -84,21 +87,6 @@
 		</sequential>
 	</macrodef>
 
-	<macrodef name="mlist">
-
-		<attribute name="inode" />
-		<attribute name="hostname" default="localhost"/>
-		<attribute name="port" default="4414" />
-
-		<sequential>
-			<echo message="M.LIST target starting ...${line.separator}" />
-			<echo message="Command line: ${iib.path}${file.separator}server${file.separator}bin${file.separator}${mqsi.list} @{inode} -i @{hostname} -p @{port} -d 0 ${line.separator}" />
-			<exec executable="${iib.path}${file.separator}server${file.separator}bin${file.separator}${mqsi.list}" failonerror="true" outputProperty="mqsilist.result">
-				<arg line="@{inode} -i @{hostname} -p @{port} -d 0" />
-			</exec>
-		</sequential>
-	</macrodef>
-
 	<macrodef name="mdeploy">
 
 		<attribute name="inode" />
@@ -109,12 +97,21 @@
 
 		<sequential>
 			<echo message="MULTI.DEPLOY target starting ...${line.separator}" />
-			<echo message="Command line: ${iib.path}${file.separator}server${file.separator}bin${file.separator}${mqsi.deploy} @{inode} -i @{hostname} -p @{port} -a @{barfile} -e @{execgroup} -m${line.separator}" />
+			<echo message="Command line: ${iib.path}${file.separator}server${file.separator}bin${file.separator}${mqsi.deploy} @{inode} -i @{hostname} -p @{port} -a @{barfile} -e @{execgroup}${line.separator}" />
 			<exec executable="${iib.path}${file.separator}server${file.separator}bin${file.separator}${mqsi.deploy}" failonerror="true">
-				<arg line="@{inode} -i @{hostname} -p @{port} -a @{barfile} -e @{execgroup} -m" />
+				<arg line="@{inode} -i @{hostname} -p @{port} -a @{barfile} -e @{execgroup}" />
 			</exec>
 		</sequential>
 	</macrodef>
+
+	<target name="testHTTP" depends="multiDeploy">
+  <echo message="TEST target starting ..." />
+  <java classname="demo.iib.ci.TestClient">
+    <classpath>
+      <pathelement location="${basedir}${file.separator}TestClient${file.separator}bin" />
+    </classpath>
+  </java>
+</target>
 
 	<!-- TODO. The deployed BAR file to be copied to an object store -->
 
