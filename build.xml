@@ -104,6 +104,13 @@
 		</sequential>
 	</macrodef>
 
+	<!-- <exec executable="cmd" os="windows">
+  <arg value="/C"/>
+  <arg value="command to run"/>
+</exec>
+
+-->
+
 	<target name="testHTTP" depends="multiDeploy">
   <echo message="TEST target starting ..." />
   <java classname="demo.iib.ci.TestClient">
