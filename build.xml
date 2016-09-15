@@ -7,10 +7,9 @@
 	<property name="iib.barfile.param" value="${barfile.dir}${file.separator}${iib.bar}_${iib.bar.version}.bar" />
 	<property name="override.file" location="${basedir}${file.separator}${iib.override.file}" />
 
-	<!-- Java class names of three MQSI commands -->
+	<!-- Java class names of applybaroverride command -->
 
 	<property name="mqsi.applybaroverride" value="com.ibm.broker.config.util.ApplyBarOverride" />
-
 
 	<!-- Parameters for the various MQSI commands -->
 
@@ -36,12 +35,12 @@
 
 	<echo message="Build start time: ${time.stamp}" />
 
-	<target name="cleanup" description="Deletes compiled bar files for this specific application or project." unless="${deploy.only}">
+	<target name="cleanup" description="Deletes compiled bar file for this specific application or project." unless="${deploy.only}">
 		<echo message="CLEANUP target is starting ...${line.separator}" />
 		<delete failonerror="false" verbose="true">
 			<fileset dir="${barfile.dir}" includes="**/${iib.bar}*.bar" />
-			<fileset dir="${basedir}" includes="**/*.log" />
-			<fileset dir="${basedir}" includes="**/TEST*.xml" />
+			<fileset dir="${basedir}" includes="*.log" />
+			<fileset dir="${basedir}" includes="TEST*.xml" />
 			<fileset dir="${basedir}" includes="**/*.class" />
 		</delete>
 	</target>

@@ -36,11 +36,9 @@ switch (iibEnv) {
 
 if (org.gradle.internal.os.OperatingSystem.current().windows) {
 
-        ant.properties['mqsi.deploy'] = 'mqsideploy.exe'
         ant.properties['mqsi.deployw'] = 'mqsideployw.bat'
         ant.properties['mqsi.deployw.param'] = '/C'
         ant.properties['mqsi.createbar'] = 'mqsicreatebar.exe'
-        ant.properties['mqsi.list'] = 'mqsilist.exe'
         ant.properties['iib.path'] = mqsiprofilePathWin
         ant.properties['cmd.exec'] = 'cmd.exe'
 
@@ -48,11 +46,9 @@ if (org.gradle.internal.os.OperatingSystem.current().windows) {
 
       } else if (org.gradle.internal.os.OperatingSystem.current().macOsX) {
 
-        ant.properties['mqsi.deploy'] = 'mqsideploy'
         ant.properties['mqsi.deployw'] = 'mqsideployw'
         ant.properties['mqsi.deployw.param'] = ''
         ant.properties['mqsi.createbar'] = 'mqsicreatebar'
-        ant.properties['mqsi.list'] = 'mqsilist'
         ant.properties['iib.path'] = mqsiprofilePathMacOS
         ant.properties['cmd.exec'] = projectDir.getPath() + '/mqsideployw'
 
@@ -60,11 +56,9 @@ if (org.gradle.internal.os.OperatingSystem.current().windows) {
 
       } else {
 
-        ant.properties['mqsi.deploy'] = 'mqsideploy'
         ant.properties['mqsi.deployw'] = 'mqsideployw'
         ant.properties['mqsi.deployw.param'] = ''
         ant.properties['mqsi.createbar'] = 'mqsicreatebar'
-        ant.properties['mqsi.list'] = 'mqsilist'
         ant.properties['iib.path'] = mqsiprofilePathUnix
         ant.properties['cmd.exec'] = projectDir.getPath() + '/mqsideployw'
 
@@ -168,7 +162,7 @@ tasks.multiDeploy {
 
 tasks.runSoapUI {
 
-  description "Runs a SoapUI Test Project and geberates a junit-style test report."
+  description "Runs a SoapUI Test Project and generates a junit-style test report."
 }
 
 multiDeploy.dependsOn('compile', 'override')
