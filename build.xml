@@ -99,7 +99,7 @@
 			<echo message="MULTI.DEPLOY target starting ...${line.separator}" />
 			<echo message="Preparing the MQSI environment ..." />
 			<echo message="Command line: ${cmd.exec} ${mqsi.deployw.param} ${basedir}${file.separator}${mqsi.deployw} ${iib.path}${file.separator}server${file.separator}bin @{inode} @{hostname} @{port} @{barfile} @{execgroup}" />
-			<exec executable="${cmd.exec}">
+			<exec executable="${cmd.exec}" failonerror="true">
 		  	<arg line="${mqsi.deployw.param} ${basedir}${file.separator}${mqsi.deployw} '${iib.path}${file.separator}server${file.separator}bin' @{inode} @{hostname} @{port} @{barfile} @{execgroup}"/>
 			</exec>
 		</sequential>
