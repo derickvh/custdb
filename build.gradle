@@ -37,27 +37,36 @@ switch (iibEnv) {
 if (org.gradle.internal.os.OperatingSystem.current().windows) {
 
         ant.properties['mqsi.deploy'] = 'mqsideploy.exe'
+        ant.properties['mqsi.deployw'] = 'mqsideployw.bat'
+        ant.properties['mqsi.deployw.param'] = '/C'
         ant.properties['mqsi.createbar'] = 'mqsicreatebar.exe'
         ant.properties['mqsi.list'] = 'mqsilist.exe'
         ant.properties['iib.path'] = mqsiprofilePathWin
+        ant.properties['cmd.exec'] = 'cmd.exe'
 
         soapuiExec = soapUIPathWin + '\\testrunner.bat'
 
       } else if (org.gradle.internal.os.OperatingSystem.current().macOsX) {
 
         ant.properties['mqsi.deploy'] = 'mqsideploy'
+        ant.properties['mqsi.deployw'] = 'mqsideployw'
+        ant.properties['mqsi.deployw.param'] = 'source'
         ant.properties['mqsi.createbar'] = 'mqsicreatebar'
         ant.properties['mqsi.list'] = 'mqsilist'
         ant.properties['iib.path'] = mqsiprofilePathMacOS
+        ant.properties['cmd.exec'] = '/bin/sh'
 
         soapuiExec = soapUIPathMacOS + '/testrunner.sh'
 
       } else {
 
         ant.properties['mqsi.deploy'] = 'mqsideploy'
+        ant.properties['mqsi.deployw'] = 'mqsideployw'
+        ant.properties['mqsi.deployw.param'] = 'source'
         ant.properties['mqsi.createbar'] = 'mqsicreatebar'
         ant.properties['mqsi.list'] = 'mqsilist'
         ant.properties['iib.path'] = mqsiprofilePathUnix
+        ant.properties['cmd.exec'] = '/bin/sh'
 
         soapuiExec = soapUIPathUnix + '/testrunner.sh'
 }
@@ -141,7 +150,7 @@ def soapuiXmlToHtml(resultsDir) {
 
 Properties readPropsFile(File fProps) {
 
- logger.quiet 'Reading a properties file.'
+ ant.echo('Reading a properties file.') 
 
  if (!fProps.exists()) {
      throw new GradleException(

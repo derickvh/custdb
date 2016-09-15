@@ -3,22 +3,21 @@
 
 @REM Saves the current working directory and enter the directory where 'mqsiprofile' generally lives.
 
-pushd %1
+@pushd %1
 
-@call "mqsiprofile.cmd"
+@call "mqsiprofile.cmd" >NUL 2>NUL
 
-REM >NUL 2>NUL
+:: Get back to the project directory
 
-popd
+@popd
 
-echo '%~dp0'
+:: Now mqsideploy can be called.
 
-:: Get back to the project directory.
 ::
 :: %2 = integration node
 :: %3 = hostname
 :: %4 = port
 :: %5 = bar file
-:: %6 = intergration server
+:: %6 = intergration server (execution group)
 
-echo "mqsideploy %2 -i %3 -p %4 -a %5 -e %6"
+mqsideploy %2 -i %3 -p %4 -a %5 -e %6

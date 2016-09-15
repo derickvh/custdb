@@ -97,19 +97,13 @@
 
 		<sequential>
 			<echo message="MULTI.DEPLOY target starting ...${line.separator}" />
-			<echo message="Command line: ${iib.path}${file.separator}server${file.separator}bin${file.separator}${mqsi.deploy} @{inode} -i @{hostname} -p @{port} -a @{barfile} -e @{execgroup}${line.separator}" />
-			<exec executable="${iib.path}${file.separator}server${file.separator}bin${file.separator}${mqsi.deploy}" failonerror="true">
-				<arg line="@{inode} -i @{hostname} -p @{port} -a @{barfile} -e @{execgroup}" />
+			<echo message="Preparing the MQSI environment ..." />
+			<echo message="Command line: ${cmd.exec} ${mqsi.deployw.param} ${basedir}${file.separator}${mqsi.deployw} ${iib.path}${file.separator}server${file.separator}bin @{inode} @{hostname} @{port} @{barfile} @{execgroup}" />
+			<exec executable="${cmd.exec}">
+		  	<arg line="${mqsi.deployw.param} ${basedir}${file.separator}${mqsi.deployw} '${iib.path}${file.separator}server${file.separator}bin' @{inode} @{hostname} @{port} @{barfile} @{execgroup}"/>
 			</exec>
 		</sequential>
 	</macrodef>
-
-	<!-- <exec executable="cmd" os="windows">
-  <arg value="/C"/>
-  <arg value="command to run"/>
-</exec>
-
--->
 
 	<target name="testHTTP" depends="multiDeploy">
   <echo message="TEST target starting ..." />
